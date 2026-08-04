@@ -273,8 +273,15 @@ def __getattr__(name: str):
         #    see the test failures).
         global _current_platform
         if _current_platform is None:
-            platform_cls_qualname = resolve_current_platform_cls_qualname()
-            _current_platform = resolve_obj_by_qualname(platform_cls_qualname)()
+            try:
+                platform_cls_qualname = resolve_current_platform_cls_qualname()
+                _current_platform = resolve_obj_by_qualname(platform_cls_qualname)()
+            except Exception as e:
+                import traceback
+                print("=== ERROR IN PLATFORM INITIALIZATION ===", flush=True)
+                traceback.print_exc()
+                print("=========================================", flush=True)
+                raise e
             global _init_trace
             _init_trace = "".join(traceback.format_stack())
         return _current_platform
